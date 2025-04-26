@@ -69,6 +69,6 @@ def load_csv_to_db(csv_path: str, ticker: str):
         print("Error writing to database:", e)
 
 if __name__ == "__main__":
-    csv_file_path = "1minS______.csv"
+    csv_file_path = "1minS__.csv"
     ticker = "____"
     load_csv_to_db(csv_file_path, ticker)
