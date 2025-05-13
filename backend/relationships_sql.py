@@ -154,6 +154,8 @@ def create_stocktype_table(stock_type):
 
     parent_name = "StocksMain"
     parent_table_type = Table(parent_name, metadata, autoload_with=engine)
+    parent_table_type['Date'] = parent_table_type.to_datetime(df['Date'])
+    parent_table_type = parent_table_type.sort_values(by='Date', ascending=True)
     insertion_request = insert(parent_table_type).values(
         stocktype = stock_type,
         tablename = name)
@@ -208,6 +210,9 @@ def start_stockdb():
     create_stocks_table()
 
 
-# push_stockdata_folder("C", "1min", 1, "/Users/joshelkind/learnds/data")
+push_stockdata_folder("T", "1min", 1, "/Users/joshelkind/stan/backend/data")
 
-# push_stocktype_folder("P", "Players", "1min", 1, "/Users/joshelkind/learnds/data")
+# push_stocktype_folder("T", "Test", "1min", 1, "/Users/joshelkind/stan/backend/data")
+
+### PUT SOME SHORT MIXTURE OF ASSETS in TTYPE ("T") and make them short 200 000 rows each (put 4 tables only)
+### THIS WAY WE CAN DEMO ON WEBSITE TO USERS QUICKLY!!!
