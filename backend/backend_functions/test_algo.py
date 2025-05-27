@@ -356,7 +356,7 @@ def asset_test_single(arr_asset, postition_length, gain_percentage, loss_percent
     for j in range(len(algos)):
         print("Applying Algo " + str(j + 1))
         curr_algo = (algos[j](data_single_asset))
-        new_actions = clean_clusters_arr_format(curr_algo["Action"].to_numpy(), clean_range)
+        new_actions = clean_clusters_arr_format(curr_algo, clean_range)
         post_algos.append(new_actions)
     combined_algos = algos_combine_arr_format(post_algos, intercept_range, min(len(algos), intercept_needed), len(data_single_asset))
     

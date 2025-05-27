@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String, Float, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship 
 from datetime import datetime
 from sqlalchemy import asc, desc, text
+import numpy as np
 
 def pivot_atr_algorithm(df):
     """
@@ -71,12 +72,10 @@ def pivot_atr_algorithm(df):
             actions[i] = 'Buy'
 
     # 5. Assign actions to a new column in DataFrame
-    df['Action'] = actions
+ 
 
     # 6. Save the DataFrame to the output file
-    return df
-
-import pandas as pd
+    return actions.to_numpy()
 
 def bollinger_bands_minute_strategy(df):
     """
@@ -127,11 +126,8 @@ def bollinger_bands_minute_strategy(df):
     # Drop intermediate calculation columns to keep the output clean
     df = df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
 
-    return df
+    return df['Action'].to_numpy()
 
-
-import pandas as pd
-import numpy as np
 
 def macd_vwap_strategy(df):
     """
@@ -204,7 +200,7 @@ def macd_vwap_strategy(df):
     # Clean up intermediate columns
     df = df[['date', 'open', 'high', 'low', 'close', 'volume', 'VWAP', 'MACD', 'Signal Line', 'Action']]
     
-    return df
+    return df['Action'].to_numpy()
 
 
 def vwap_pullback_strategy(df):
@@ -267,7 +263,7 @@ def vwap_pullback_strategy(df):
     # Drop intermediate columns for clean output
     df = df[['date', 'open', 'high', 'low', 'close', 'volume', 'VWAP', 'Action']]
 
-    return df
+    return df['Action'].to_numpy()
 
 def momentum_strategy(df):
     df = df.copy()  # work on a copy
@@ -284,7 +280,8 @@ def momentum_strategy(df):
     df.loc[buy_signal, 'Action'] = 'Buy'
     df.loc[sell_signal, 'Action'] = 'Sell'
     # Return only the required columns
-    return df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
+    final = df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
+    return final['Action'].to_numpy()
 
 def mean_reversion_strategy(df):
     df = df.copy()
@@ -300,7 +297,8 @@ def mean_reversion_strategy(df):
     sell_signal = (df['close'] > df['upper']) & (df['close'].shift(1) <= df['upper'].shift(1))
     df.loc[buy_signal, 'Action'] = 'Buy'
     df.loc[sell_signal, 'Action'] = 'Sell'
-    return df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
+    final = df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
+    return final['Action'].to_numpy()
 
 def breakout_strategy(df):
     df = df.copy()
@@ -312,7 +310,8 @@ def breakout_strategy(df):
     # Buy if current close breaks above the recent high; Sell if breaks below recent low
     df.loc[df['close'] > df['recent_high'], 'Action'] = 'Buy'
     df.loc[df['close'] < df['recent_low'], 'Action'] = 'Sell'
-    return df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
+    final = df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
+    return final['Action'].to_numpy()
 
 
 def hft_pattern_strategy(df):
@@ -327,7 +326,8 @@ def hft_pattern_strategy(df):
     # If return is less than -3σ (sharp drop) => Buy signal (mean-revert up expected)
     df.loc[df['return'] > 3 * df['volatility'], 'Action'] = 'Sell'
     df.loc[df['return'] < -3 * df['volatility'], 'Action'] = 'Buy'
-    return df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
+    final = df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
+    return final['Action'].to_numpy()
 
 def candlestick_pattern_strategy(df):
     df = df.copy()
@@ -343,7 +343,8 @@ def candlestick_pattern_strategy(df):
     df['Action'] = 'Hold'
     df.loc[bullish_engulf, 'Action'] = 'Buy'
     df.loc[bearish_engulf, 'Action'] = 'Sell'
-    return df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
+    final = df[['date', 'open', 'high', 'low', 'close', 'volume', 'Action']]
+    return final['Action'].to_numpy()
 
 
 
@@ -352,20 +353,6 @@ def candlestick_pattern_strategy(df):
 # Example usage:
 # result_df = macd_vwap_strategy("path_to_your_1min_data.csv")
 # print(result_df.head())
-
-db_url = 'postgresql://postgres@localhost:5432/stock-data' 
-engine = create_engine(db_url)  
-
-query = text(f'SELECT * FROM "{("1min_BTC")}"') # add each asset of that type
-df_datacore = (pd.read_sql(query, engine))
-df_datacore['date'] = pd.to_datetime(df_datacore['date'])
-df_datacore = df_datacore.sort_values(by='date', ascending=True)
-
-df = df_datacore
-
-df = bollinger_bands_minute_strategy(df)
-df.to_csv("result1.csv", index=False)
-
 # Example usage
 # result_df = bollinger_bands_minute_strategy("path_to_your_1min_data.csv")
 # print(result_df.head())
