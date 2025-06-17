@@ -116,11 +116,53 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+.explora-regular {
+  font-family: "Explora", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.permanent-marker-regular {
+  font-family: "Permanent Marker", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+.sriracha-regular {
+  font-family: "Sriracha", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    @apply font-sans;
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;  
   }
 }
+
+#__next-build-watcher {
+  display: none !important;
+}
+
+[data-nextjs-scroll-focus-boundary] + div {
+  display: none !important;
+}
+
+div[style*="position: fixed"][style*="bottom: 10px"][style*="right: 20px"] {
+  display: none !important;
+}
+
+button {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.fixed-header button {
+  background: transparent !important;
+}
+

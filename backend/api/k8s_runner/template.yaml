@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-placeholder
+spec:
+  backoffLimit: 1  # allow at least 1 retry before fully giving up
+  ttlSecondsAfterFinished: 600  
+  template:
+    spec:
+      containers:
+      - name: algo-runner
+        image: PLACEHOLDER_IMAGE
+        envFrom:
+        - secretRef:
+            name: aws-creds
+        - secretRef:
+            name: db-creds
+        env:
+        - name: S3_KEY
+          value: placeholder.py
+        - name: FUNC_NAME
+          value: placeholder_func
+        - name: TABLE_NAME
+          value: placeholder_table
+        - name: RESULT_KEY
+          value: placeholder_result
+      restartPolicy: Never
+      imagePullSecrets:
+      - name: ecr-creds

@@ -1,0 +1,10 @@
+pandas
+numpy
+boto3
+sqlalchemy
+psycopg2-binary
+python-dotenv
+ta
+kubernetes>=26.1.0
+statsmodels
+scipy
