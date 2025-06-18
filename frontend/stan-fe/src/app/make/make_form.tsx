@@ -466,6 +466,7 @@ export default function MakeForm() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/scripts/user/add/`, {
         method: "POST",
+        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.accessToken}`,

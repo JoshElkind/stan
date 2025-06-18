@@ -96,6 +96,7 @@ export default function Visualize() {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/past-evals/`, {
           method: "GET",
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${session.accessToken}`,
             "Content-Type": "application/json",

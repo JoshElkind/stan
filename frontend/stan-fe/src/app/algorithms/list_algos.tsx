@@ -51,6 +51,7 @@ export default function ListAlgos({ sortMethod = "date_added" }: ListAlgosProps)
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/scripts/user/`, {
           method: "GET",
+          credentials: 'include',
           headers: {
             Authorization: `Bearer ${session.accessToken}`,
             "Content-Type": "application/json",
@@ -116,6 +117,7 @@ export default function ListAlgos({ sortMethod = "date_added" }: ListAlgosProps)
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/scripts/preview/`, {
         method: "POST",
+        credentials: 'include',
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
           "Content-Type": "application/json",
@@ -155,6 +157,7 @@ export default function ListAlgos({ sortMethod = "date_added" }: ListAlgosProps)
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/scripts/user/delete/`, {
         method: "DELETE",
+        credentials: 'include',
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
           "Content-Type": "application/json",
