@@ -3,92 +3,129 @@ import { useSession, signOut } from "next-auth/react"
 import { useCallback, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 
+interface AuthApiError extends Error {
+  status?: number
+  code?: string
+}
+
 export function useAuthApi() {
   const { data: session, update } = useSession()
   const router = useRouter()
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const refreshDebounceRef = useRef<NodeJS.Timeout | null>(null)
+  const refreshPromiseRef = useRef<Promise<any> | null>(null)
+
+  const refreshToken = useCallback(async () => {
+    // Prevent multiple concurrent refresh attempts
+    if (refreshPromiseRef.current) {
+      return refreshPromiseRef.current
+    }
+
+    setIsRefreshing(true)
+    
+    refreshPromiseRef.current = update()
+      .then((updatedSession) => {
+        if (updatedSession?.error === "RefreshAccessTokenError") {
+          throw new Error("Session expired")
+        }
+        return updatedSession
+      })
+      .finally(() => {
+        setIsRefreshing(false)
+        refreshPromiseRef.current = null
+      })
+
+    return refreshPromiseRef.current
+  }, [update])
 
   const makeAuthenticatedRequest = useCallback(
     async (url: string, options: RequestInit = {}) => {
       if (!session?.accessToken) {
-        throw new Error("No access token available")
+        const error: AuthApiError = new Error("No access token available")
+        error.code = "NO_ACCESS_TOKEN"
+        throw error
       }
 
       if (session.error === "RefreshAccessTokenError") {
         await signOut({ callbackUrl: "/" })
-        throw new Error("Session expired")
+        const error: AuthApiError = new Error("Session expired")
+        error.code = "SESSION_EXPIRED"
+        throw error
       }
 
-      try {
-        const response = await fetch(url, {
+      const makeRequest = async (token: string) => {
+        return fetch(url, {
           ...options,
           headers: {
             ...options.headers,
-            Authorization: `Bearer ${session.accessToken}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         })
+      }
 
+      try {
+        const response = await makeRequest(session.accessToken)
+
+        // Handle authentication errors
         if (response.status === 401 || response.status === 403) {
-          if (isRefreshing) {
-            throw new Error(`HTTP error! status: ${response.status}`)
-          }
-
-          setIsRefreshing(true)
-
-          if (refreshDebounceRef.current) {
-            clearTimeout(refreshDebounceRef.current)
-          }
-
-          refreshDebounceRef.current = setTimeout(async () => {
-            try {
-              const updatedSession = await update()
-              setIsRefreshing(false)
-
-              if (updatedSession?.error === "RefreshAccessTokenError") {
-                router.replace("/")
-                throw new Error("Session expired")
+          try {
+            const refreshedSession = await refreshToken()
+            
+            if (refreshedSession?.accessToken) {
+              // Retry with new token
+              const retryResponse = await makeRequest(refreshedSession.accessToken)
+              
+              if (!retryResponse.ok) {
+                const error: AuthApiError = new Error(`HTTP error! status: ${retryResponse.status}`)
+                error.status = retryResponse.status
+                throw error
               }
-            } catch (error) {
-              setIsRefreshing(false)
-              throw new Error(`Failed to refresh token: ${error}`)
+              
+              return retryResponse
+            } else {
+              router.replace("/")
+              const error: AuthApiError = new Error("Failed to refresh session")
+              error.code = "REFRESH_FAILED"
+              throw error
             }
-          }, 300)
-
-          await new Promise((resolve) => setTimeout(resolve, 350))
-
-          if (session?.accessToken) {
-            return fetch(url, {
-              ...options,
-              headers: {
-                ...options.headers,
-                Authorization: `Bearer ${session.accessToken}`,
-                "Content-Type": "application/json",
-              },
-            })
+          } catch (refreshError) {
+            const error: AuthApiError = new Error("Session refresh failed")
+            error.code = "REFRESH_ERROR"
+            throw error
           }
         }
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+          const error: AuthApiError = new Error(`HTTP error! status: ${response.status}`)
+          error.status = response.status
+          throw error
         }
 
         return response
       } catch (error) {
-        const errorEvent = new ErrorEvent("error", {
-          error: error,
-          message: error instanceof Error ? error.message : String(error),
-          lineno: 0,
-          colno: 0,
-          filename: "use-auth-api.tsx",
+        // Create custom error event for global error handling
+        const errorEvent = new CustomEvent("authApiError", {
+          detail: {
+            error,
+            url,
+            timestamp: new Date().toISOString(),
+          },
         })
-        window.dispatchEvent(errorEvent)
+        
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(errorEvent)
+        }
+        
         throw error
       }
     },
-    [session, update, isRefreshing, router],
+    [session, refreshToken, router]
   )
 
-  return { makeAuthenticatedRequest, session, isRefreshing }
+  return { 
+    makeAuthenticatedRequest, 
+    session, 
+    isRefreshing,
+    refreshToken 
+  }
 }

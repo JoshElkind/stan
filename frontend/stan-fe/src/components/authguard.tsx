@@ -4,11 +4,17 @@ import type React from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState, useRef } from "react"
 import { LogIn, X, AlertTriangle } from "lucide-react"
+import { useSessionStorage, useIsClient } from "@/hooks/useStorage"
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const router = useRouter()
   const pathname = usePathname()
+  const isClient = useIsClient()
+  
+  // Use the SSR-safe sessionStorage hook
+  const [redirectAfterLogin, setRedirectAfterLogin] = useSessionStorage("redirectAfterLogin", "")
+  
   const [showAccessDenied, setShowAccessDenied] = useState(false)
   const [showTokenExpired, setShowTokenExpired] = useState(false)
   const [blockedPath, setBlockedPath] = useState<string | null>(null)
@@ -34,7 +40,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const isRoot = pathname === "/"
 
-    if (status === "loading") return
+    if (status === "loading" || !isClient) return
 
     if (session) {
       preventNavigation.current = false
@@ -45,15 +51,16 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       preventNavigation.current = true
       setBlockedPath(pathname)
       setShowAccessDenied(true)
-
       router.replace(currentPath)
     }
-  }, [session, status, pathname, router, currentPath])
+  }, [session, status, pathname, router, currentPath, isClient])
 
   const handleSignIn = async () => {
+    // Now using the SSR-safe hook - no need for manual client-side checks
     if (blockedPath) {
-      sessionStorage.setItem("redirectAfterLogin", blockedPath)
+      setRedirectAfterLogin(blockedPath)
     }
+    
     setShowAccessDenied(false)
     setShowTokenExpired(false)
     setBlockedPath(null)
@@ -76,10 +83,13 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   const handleForceSignOut = async () => {
     setShowTokenExpired(false)
+    // Clear the redirect path when signing out
+    setRedirectAfterLogin("")
     await signOut({ callbackUrl: "/" })
   }
 
-  if (status === "loading") {
+  // Show loading state during SSR or initial client load
+  if (status === "loading" || !isClient) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-white text-center">
@@ -100,6 +110,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
             <button
               onClick={handleCloseModal}
               className="absolute top-2 right-2 p-1 text-slate-400 hover:text-white transition-colors"
+              aria-label="Close modal"
             >
               <X className="h-3 w-3" />
             </button>
@@ -127,6 +138,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
             <button
               onClick={handleTokenExpiredClose}
               className="absolute top-2 right-2 p-1 text-slate-400 hover:text-white transition-colors"
+              aria-label="Close modal"
             >
               <X className="h-3 w-3" />
             </button>
