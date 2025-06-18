@@ -14,7 +14,7 @@ import statsmodels
 
 def main():
     try:
-        print("🔧 Starting algo runner inside container...")
+        print("starting algo runner inside container...")
 
         # Load ENV
         s3_key = os.environ["S3_KEY"]
@@ -29,7 +29,7 @@ def main():
         aws_secret_key = os.environ["AWS_SECRET_ACCESS_KEY"]
 
         # Download user Python algo code
-        print(f"📥 Downloading {s3_key} from bucket {bucket}")
+        print(f"downloading {s3_key} from bucket {bucket}")
         s3 = boto3.client("s3",
             aws_access_key_id=aws_access_key,
             aws_secret_access_key=aws_secret_key,
@@ -42,7 +42,7 @@ def main():
         db_url = f"postgresql://postgres:{db_password}@{db_uri}:5432/stock-data"
         engine = create_engine(db_url)
 
-        print(f"🗂️ Fetching data from table: {table_name}")
+        print(f"fetching data from table: {table_name}")
         df = get_asset_data(table_name, engine)
 
         # Setup exec() env
@@ -75,17 +75,17 @@ def main():
         if not all(str(x) in allowed for x in result):
             raise ValueError("Invalid return value in result list")
 
-        print("✅ Uploading result to S3...")
+        print("uploading result to S3...")
         s3.put_object(
             Bucket=bucket,
             Key=result_key,
             Body=json.dumps(list(result))  # Ensure array is JSON serializable
         )
 
-        print("🎉 Job finished successfully.")
+        print("Job finished successfully.")
 
     except Exception as e:
-        print("❌ ERROR:", str(e))
+        print("error:", str(e))
         traceback.print_exc()
 
 if __name__ == "__main__":
