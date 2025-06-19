@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react"
 import { Eye, Activity, Code2, Copy, X, Minus, FileText, Calendar } from "lucide-react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
+import { signOut } from 'next-auth/react'
 
 interface Algorithm {
   algoname: string
@@ -24,6 +25,10 @@ interface ListAlgosProps {
 }
 
 export default function ListAlgos({ sortMethod = "date_added" }: ListAlgosProps) {
+  const [notification, setNotification] = useState<{
+    type: "success" | "error"
+    message: string
+  } | null>(null)
   const [algorithms, setAlgorithms] = useState<Algorithm[]>([])
   const [sortedAlgorithms, setSortedAlgorithms] = useState<Algorithm[]>([])
   const [loading, setLoading] = useState(true)
@@ -59,6 +64,18 @@ export default function ListAlgos({ sortMethod = "date_added" }: ListAlgosProps)
         })
 
         if (!response.ok) {
+    
+          const data = await response.json()
+          if (response.status === 403 && data?.detail?.includes("Token expired")) {
+            console.warn("You've been idle for too long. Please sign in again.")
+            setNotification({
+              type: "error",
+              message: "No authentication token available",
+            })
+            signOut()
+            return
+          }
+  
           throw new Error(`HTTP error! status: ${response.status}`)
         }
 
@@ -129,6 +146,14 @@ export default function ListAlgos({ sortMethod = "date_added" }: ListAlgosProps)
       })
 
       if (!response.ok) {
+    
+        const data = await response.json()
+        if (response.status === 403 && data?.detail?.includes("Token expired")) {
+          console.warn("🔐 Token expired. Signing out...")
+          signOut()
+          return
+        }
+
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
@@ -168,8 +193,15 @@ export default function ListAlgos({ sortMethod = "date_added" }: ListAlgosProps)
       })
 
       if (!response.ok) {
+    
         const data = await response.json()
-        throw new Error(data.error || `HTTP error! status: ${response.status}`)
+        if (response.status === 403 && data?.detail?.includes("Token expired")) {
+          console.warn("🔐 Token expired. Signing out...")
+          signOut()
+          return
+        }
+
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       setAlgorithms((prev) => prev.filter((algo) => algo.algoname !== algorithmToDelete))

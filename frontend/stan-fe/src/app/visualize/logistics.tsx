@@ -7,6 +7,9 @@ import { Loader2, AlertCircle, LineChart, BarChart, PieChart, Activity } from "l
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useRouter } from "next/navigation"
+import { signOut } from 'next-auth/react'
+
+
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -82,7 +85,10 @@ export default function Visualize() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [processedData, setProcessedData] = useState<ProcessedEvaluation[]>([])
-
+  const [notification, setNotification] = useState<{
+    type: "success" | "error"
+    message: string
+  } | null>(null)
   const { data: session } = useSession()
   const router = useRouter()
 
@@ -104,6 +110,18 @@ export default function Visualize() {
         })
 
         if (!response.ok) {
+    
+          const data = await response.json()
+          if (response.status === 403 && data?.detail?.includes("Token expired")) {
+            console.warn("You've been idle for too long. Please sign in again.")
+            setNotification({
+              type: "error",
+              message: "No authentication token available",
+            })
+            signOut()
+            return
+          }
+  
           throw new Error(`HTTP error! status: ${response.status}`)
         }
 

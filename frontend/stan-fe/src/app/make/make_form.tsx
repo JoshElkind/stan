@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Minus, BarChart3 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import { signOut } from 'next-auth/react'
 import { CheckCircle, AlertCircle } from "lucide-react"
 
 function smartConvert(str: string) {
@@ -477,12 +478,19 @@ export default function MakeForm() {
       const data = await response.json()
 
       if (!response.ok) {
-        const errorMessage = data.error || "Algorithm creation failed"
-        setNotification({
-          type: "error",
-          message: errorMessage,
-        })
-        return
+    
+        const data = await response.json()
+        if (response.status === 403 && data?.detail?.includes("Token expired")) {
+          console.warn("You've been idle for too long. Please sign in again.")
+          setNotification({
+            type: "error",
+            message: "No authentication token available",
+          })
+          signOut()
+          return
+        }
+
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       // Success case - show notification and redirect

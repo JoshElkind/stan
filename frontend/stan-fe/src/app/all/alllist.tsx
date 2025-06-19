@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { AlertCircle } from 'lucide-react'
 import { useRouter } from "next/navigation"
+import { signOut } from 'next-auth/react'
+
 
 interface Evaluation {
   user: number
@@ -64,7 +66,10 @@ export default function AllList() {
   const [selectedEvaluation, setSelectedEvaluation] = useState<Evaluation | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [testResult, setTestResult] = useState<TestResult | null>(null)
-
+  const [notification, setNotification] = useState<{
+    type: "success" | "error"
+    message: string
+  } | null>(null)
   const { data: session } = useSession()
   const router = useRouter()
 
@@ -87,6 +92,18 @@ export default function AllList() {
         })
 
         if (!response.ok) {
+    
+          const data = await response.json()
+          if (response.status === 403 && data?.detail?.includes("Token expired")) {
+            console.warn("You've been idle for too long. Please sign in again.")
+            setNotification({
+              type: "error",
+              message: "No authentication token available",
+            })
+            signOut()
+            return
+          }
+  
           throw new Error(`HTTP error! status: ${response.status}`)
         }
 

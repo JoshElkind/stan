@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ChevronDown, Plus, X, Upload, FileCode, CheckCircle, AlertCircle, Activity } from "lucide-react"
 import ListAlgos, { type SortMethod } from "./list_algos"
+import { signOut } from 'next-auth/react'
 
 const MyAlgos = () => {
   const [sortMethod, setSortMethod] = useState<SortMethod>("date_added")
@@ -112,11 +113,19 @@ const MyAlgos = () => {
       const data = await response.json()
 
       if (!response.ok) {
-        const errorMessage = data.error || "Upload failed"
+    
+        const data = await response.json()
+        if (response.status === 403 && data?.detail?.includes("Token expired")) {
+          console.warn("You've been idle for too long. Please sign in again.")
+          setNotification({
+            type: "error",
+            message: "No authentication token available",
+          })
+          signOut()
+          return
+        }
 
-        // For all errors, show in modal and keep modal open
-        setModalError(getErrorMessage(errorMessage))
-        return
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       // Success case - show notification and close modal

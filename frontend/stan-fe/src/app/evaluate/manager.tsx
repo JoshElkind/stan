@@ -9,6 +9,7 @@ import { BarChart3, Eye, X, Copy, CheckCircle, AlertCircle, Globe, User, Trendin
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
 import { useRouter } from "next/navigation"
+import { signOut } from 'next-auth/react'
 
 interface PublicAlgorithm {
   algoname: string
@@ -112,6 +113,23 @@ export default function Manager() {
           throw new Error("Failed to fetch algorithms")
         }
 
+        if (!publicResponse.ok || !userResponse.ok) {
+    
+          const datapublic = await publicResponse.json()
+          const datauser = await userResponse.json()
+          if ((publicResponse.status === 403 && datapublic?.detail?.includes("Token expired")) || (userResponse.status === 403 && datauser?.detail?.includes("Token expired"))) {
+            console.warn("You've been idle for too long. Please sign in again.")
+            setNotification({
+              type: "error",
+              message: "No authentication token available",
+            })
+            signOut()
+            return
+          }
+  
+          throw new Error(`HTTP error! status: ${publicResponse.status}`)
+        }
+
         const publicData = await publicResponse.json()
         const userData = await userResponse.json()
 
@@ -169,6 +187,18 @@ export default function Manager() {
       })
 
       if (!response.ok) {
+    
+        const data = await response.json()
+        if (response.status === 403 && data?.detail?.includes("Token expired")) {
+          console.warn("You've been idle for too long. Please sign in again.")
+          setNotification({
+            type: "error",
+            message: "No authentication token available",
+          })
+          signOut()
+          return
+        }
+
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
@@ -309,6 +339,18 @@ export default function Manager() {
       })
 
       if (!response.ok) {
+    
+        const data = await response.json()
+        if (response.status === 403 && data?.detail?.includes("Token expired")) {
+          console.warn("You've been idle for too long. Please sign in again.")
+          setNotification({
+            type: "error",
+            message: "No authentication token available",
+          })
+          signOut()
+          return
+        }
+
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
