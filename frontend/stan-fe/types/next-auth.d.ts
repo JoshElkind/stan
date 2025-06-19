@@ -5,6 +5,7 @@ declare module "next-auth" {
     accessToken?: string
     accessTokenExpires?: number
     refreshToken?: string
+    id_token?: string 
     error?: string
   }
 
@@ -12,6 +13,7 @@ declare module "next-auth" {
     accessToken?: string
     accessTokenExpires?: number
     refreshToken?: string
+    idToken?: string  
     error?: string
   }
 }
