@@ -20,13 +20,12 @@ const refreshAccessToken = async (token: any) => {
 
     return {
       ...token,
-      accessToken: refreshed.access_token,
-      idToken: refreshed.id_token,
+      idToken: refreshed.id_token, // ✅ always use this for backend auth
       accessTokenExpires: Date.now() + refreshed.expires_in * 1000,
       refreshToken: refreshed.refresh_token ?? token.refreshToken,
     }
   } catch (err) {
-    console.error("Failed to refresh access token", err)
+    console.error("❌ Failed to refresh access token", err)
     return {
       ...token,
       error: "RefreshAccessTokenError",
@@ -49,12 +48,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, account, trigger }) {
-      // Initial login
       if (account) {
         return {
           ...token,
-          accessToken: account.access_token ?? account.id_token,
-          idToken: account.id_token, // ✅ send this to Django
+          idToken: account.id_token, // ✅ send only this to Django
           refreshToken: account.refresh_token,
           accessTokenExpires: account.expires_at
             ? account.expires_at * 1000
@@ -62,17 +59,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       }
 
-      // Token still valid
       if (token.accessTokenExpires && Date.now() < token.accessTokenExpires) {
         return token
       }
 
-      // No refresh token
       if (!token.refreshToken) {
         return token
       }
 
-      // Refresh if expired
       if (trigger === "update" || Date.now() >= token.accessTokenExpires) {
         return await refreshAccessToken(token)
       }
@@ -81,9 +75,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
 
     async session({ session, token }) {
-      session.accessToken = token.accessToken as string
+      session.accessToken = token.idToken as string // ✅ Use ID token as access token
       session.refreshToken = token.refreshToken as string
-      session.id_token = token.idToken as string // ✅ add to session
       session.error = token.error as string | undefined
       return session
     },
@@ -94,7 +87,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 1 day
+    maxAge: 24 * 60 * 60,
   },
 })
 
