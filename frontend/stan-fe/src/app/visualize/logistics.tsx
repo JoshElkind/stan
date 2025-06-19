@@ -423,7 +423,7 @@ export default function Visualize() {
                     <Button
                       onClick={() => router.push("/algorithms")}
                       variant="outline"
-                      className="border-slate-600 text-slate-300 hover:bg-slate-700/50 hover:text-white px-8 py-3"
+                      className="border-slate-600 text-black hover:bg-slate-700/50 hover:text-white px-8 py-3"
                     >
                       Browse Algorithms
                     </Button>
