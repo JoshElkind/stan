@@ -64,9 +64,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [session, status, pathname, router, currentPath, isClient, isPublicRoute])
 
   const handleSignIn = async () => {
-    // Now using the SSR-safe hook - no need for manual client-side checks
-    if (blockedPath) {
-      setRedirectAfterLogin(blockedPath)
+    // Clean the blocked path to remove any encoded quotes or extra characters
+    const cleanPath = blockedPath ? blockedPath.replace(/['"]/g, '').replace(/%22/g, '') : null
+    
+    if (cleanPath) {
+      setRedirectAfterLogin(cleanPath)
     }
     
     setShowAccessDenied(false)
@@ -75,7 +77,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     preventNavigation.current = false
 
     await signIn("google", {
-      callbackUrl: blockedPath || "/",
+      callbackUrl: cleanPath || "/",
     })
   }
 

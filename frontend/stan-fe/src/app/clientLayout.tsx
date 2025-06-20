@@ -17,10 +17,25 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (session && status === "authenticated" && !hasRedirected.current) {
       const redirectPath = sessionStorage.getItem("redirectAfterLogin")
+      
       if (redirectPath && redirectPath !== "/" && redirectPath !== window.location.pathname) {
-        hasRedirected.current = true
-        sessionStorage.removeItem("redirectAfterLogin")
-        router.push(redirectPath)
+        // Clean the redirect path to remove any encoded quotes or extra characters
+        const cleanPath = redirectPath
+          .replace(/['"]/g, '')  // Remove any literal quotes
+          .replace(/%22/g, '')   // Remove URL-encoded quotes
+          .replace(/^\/+/, '/')  // Remove duplicate leading slashes
+        
+        // Validate that the cleaned path is a valid route
+        if (cleanPath && cleanPath.startsWith('/') && cleanPath !== window.location.pathname) {
+          hasRedirected.current = true
+          sessionStorage.removeItem("redirectAfterLogin")
+          
+          console.log('Redirecting to cleaned path:', cleanPath) // Debug log
+          router.push(cleanPath)
+        } else {
+          // If path is invalid, clear it and stay on current page
+          sessionStorage.removeItem("redirectAfterLogin")
+        }
       }
     }
 
