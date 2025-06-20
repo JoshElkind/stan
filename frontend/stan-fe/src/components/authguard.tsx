@@ -6,6 +6,9 @@ import { useEffect, useState, useRef } from "react"
 import { LogIn, X, AlertTriangle } from "lucide-react"
 import { useSessionStorage, useIsClient } from "@/hooks/useStorage"
 
+// Define public routes that don't require authentication
+const PUBLIC_ROUTES = ["/", "/about", "/faq"]
+
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -21,6 +24,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [currentPath, setCurrentPath] = useState<string>("/")
   const preventNavigation = useRef(false)
 
+  // Check if current route is public
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname)
+
   useEffect(() => {
     if (session?.error === "RefreshAccessTokenError") {
       setShowTokenExpired(true)
@@ -28,32 +34,34 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [session])
 
   useEffect(() => {
-    if (session) {
+    if (session || isPublicRoute) {
       setCurrentPath(pathname)
       preventNavigation.current = false
-    } else if (pathname === "/") {
-      setCurrentPath("/")
-      preventNavigation.current = false
     }
-  }, [session, pathname])
+  }, [session, pathname, isPublicRoute])
 
   useEffect(() => {
-    const isRoot = pathname === "/"
-
     if (status === "loading" || !isClient) return
 
+    // If route is public, always allow access
+    if (isPublicRoute) {
+      preventNavigation.current = false
+      return
+    }
+
+    // For protected routes, check authentication
     if (session) {
       preventNavigation.current = false
       return
     }
 
-    if (!session && !isRoot && !preventNavigation.current) {
+    if (!session && !preventNavigation.current) {
       preventNavigation.current = true
       setBlockedPath(pathname)
       setShowAccessDenied(true)
       router.replace(currentPath)
     }
-  }, [session, status, pathname, router, currentPath, isClient])
+  }, [session, status, pathname, router, currentPath, isClient, isPublicRoute])
 
   const handleSignIn = async () => {
     // Now using the SSR-safe hook - no need for manual client-side checks
