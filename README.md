@@ -64,21 +64,21 @@ To access a comprehensive walkthrough of the platform, view the Loom video demo:
 
 ## 🖼 Photos
 
-### Evaluate Your Algorithms
+### Evaluate Your Algorithms ↓
 ![Evaluate Your Algorithms](./screenshots/13.png)
 ![Evaluate Your Algorithms](./screenshots/14.png)
 ![Evaluate Your Algorithms](./screenshots/15.png)
 ![Evaluate Your Algorithms](./screenshots/16.png)
 
-### Evaluation Results
+### Evaluation Results ↓
 ![Evaluation Results](./screenshots/17.png)
 ![Evaluation Results](./screenshots/18.png)
 ![Evaluation Results](./screenshots/19.png)
 
-### View Past Evaluations
+### View Past Evaluations ↓
 ![View Past Evaluations](./screenshots/20.png)
 
-### Evaluation Analytics
+### Evaluation Analytics ↓
 ![Evaluation Analytics](./screenshots/21.png)
 ![Evaluation Analytics](./screenshots/22.png)
 ![Evaluation Analytics](./screenshots/23.png)
@@ -86,37 +86,37 @@ To access a comprehensive walkthrough of the platform, view the Loom video demo:
 ![Evaluation Analytics](./screenshots/25.png)
 ![Evaluation Analytics](./screenshots/27.png)
 
-### View Your Algorithms
+#### View Your Algorithms ↓
 ![View Your Algorithms](./screenshots/3.png)
 
-### Preview Your Algorithms
+#### Preview Your Algorithms ↓
 ![Preview Your Algorithms](./screenshots/4.png)
 
-### Delete Your Algorithms
+#### Delete Your Algorithms ↓
 ![Delete Your Algorithms](./screenshots/5.png)
 
-### Upload Your Algorithms
+#### Upload Your Algorithms ↓
 ![Upload Your Algorithms](./screenshots/6.png)
 
-### Create Your Algorithms
+#### Create Your Algorithms ↓
 ![Create Your Algorithms](./screenshots/7.png)
 ![Create Your Algorithms](./screenshots/8.png)
 ![Create Your Algorithms](./screenshots/9.png)
 ![Create Your Algorithms](./screenshots/10.png)
 
-### Homepage
+#### Homepage ↓
 ![Homepage](./screenshots/1.png)
 
-### Sign In
+#### Sign In ↓
 ![Sign In](./screenshots/12.png)
 
-### Sign Out
+#### Sign Out ↓
 ![Sign Out](./screenshots/2.png)
 
-### About Page
+#### About Page ↓
 ![About](./screenshots/28.png)
 
-### User Guide
+#### User Guide ↓
 ![User Guide](./screenshots/29.png)
 
 ---
