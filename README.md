@@ -126,4 +126,4 @@ To access a comprehensive walkthrough of the platform, view the Loom video demo:
 - 🌐 Website: [https://stanquant.com](https://stanquant.com)  
 - 👨‍💻 Developer: [Joshua Elkind](https://www.linkedin.com/in/joshuaelkind)
 
-Note: Deployment currently paused, please contact me
+Note: Deployment currently paused, please contact me.
