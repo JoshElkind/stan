@@ -125,4 +125,4 @@ To access a comprehensive walkthrough of the platform, view the Loom video demo:
 
 - Website: [https://stanquant.com](https://stanquant.com)  
 
-Note: Deployment currently paused, please contact me.
+Note: Backend deployment currently paused, please contact me.
