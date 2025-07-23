@@ -1,4 +1,4 @@
-# 📊 StanQuant — Trading Algorithm Sandbox
+# StanQuant — Trading Algorithm Sandbox
 
 StanQuant is a full-stack web platform for designing, uploading, and evaluating stock trading algorithms on millions of rows of historical data. 
 
@@ -6,55 +6,55 @@ Built to empower both beginner and experienced traders, this system provides a s
 
 ---
 
-## 🧠 Summary
+## Summary
 
 As an undergraduate Computer Science student at the University of Waterloo, I created this project to solve a personal need — I wanted a place to test my own trading scripts using real, large-scale financial data with flexibility and safety.
 
 This app lets users:
-- 🧩 Upload or create algorithmic trading strategies  
-- 📈 Evaluate them using detailed statistical backtesting tools  
-- 📊 Store, preview, and compare results for better decision-making  
+- Upload or create algorithmic trading strategies  
+- Evaluate them using detailed statistical backtesting tools  
+- Store, preview, and compare results for better decision-making  
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
-- ⚛️ **Frontend:** React + Next.js + TailwindCSS  
-- 🐍 **Backend:** Django + Django REST Framework  
-- 🔥 **Data Processing:** Apache Spark (PySpark), Pandas, NumPy  
-- 🗄 **Database:** AWS RDS (PostgreSQL) with SQLAlchemy ORM  
-- 🐳 **Script Execution:** Kubernetes Jobs on AWS EKS with Dockerized workloads  
-- ☁️ **File Storage:** Amazon S3 (managed via `boto3`)  
-- 🔐 **Security:** All uploaded user files run inside isolated containers with timeouts, resource caps, and no external network access  
+- ⚛**Frontend:** React + Next.js + TailwindCSS  
+- **Backend:** Django + Django REST Framework  
+- **Data Processing:** Apache Spark (PySpark), Pandas, NumPy  
+- **Database:** AWS RDS (PostgreSQL) with SQLAlchemy ORM  
+- **Script Execution:** Kubernetes Jobs on AWS EKS with Dockerized workloads  
+- **File Storage:** Amazon S3 (managed via `boto3`)  
+- **Security:** All uploaded user files run inside isolated containers with timeouts, resource caps, and no external network access  
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-### 📤 Algorithm Upload & Validation
+### Algorithm Upload & Validation
 - Upload `.py` scripts containing a single strategy function (`def your_algo(df)`).
 - Must return a `list` or `array` of Buy/Sell/Hold signals matching the length of the DataFrame.
 - Uploaded files are validated before execution.
 
-### 🧪 Secure Execution Environment
+### Secure Execution Environment
 - Each user-uploaded script is executed in a sealed Kubernetes container using AWS EKS.
 - The job fetches historical stock data from AWS RDS, runs the algorithm, and stores output results back to S3.
 
-### ⚡ High-Performance Data Handling
+### High-Performance Data Handling
 - Evaluations run on minute-level historical stock data (millions of rows per test).
 - Uses PySpark and Pandas for fast, scalable processing of time-series indicators, rolling windows, and deciders.
 
-### 📊 Algorithm Evaluation System
+### Algorithm Evaluation System
 - Users input metrics like:
-  - 🎯 Gain & Loss thresholds  
-  - 📉 Intercept Ranges  
-  - 🧹 Clean conflict filtering  
-  - ⏳ Position duration  
+  - Gain & Loss thresholds  
+  - Intercept Ranges  
+  - Clean conflict filtering  
+  - Position duration  
 - Algorithms can be combined and tested for consensus agreement.
 
 ---
 
-## 🎥 Demo Video
+## Demo Video
 
 To access a comprehensive walkthrough of the platform, view the Loom video demo:
 
@@ -62,7 +62,7 @@ To access a comprehensive walkthrough of the platform, view the Loom video demo:
 
 ---
 
-## 🖼 Photos
+## Photos
 
 ### Evaluate Your Algorithms ↓
 ![Evaluate Your Algorithms](./screenshots/13.png)
@@ -121,9 +121,8 @@ To access a comprehensive walkthrough of the platform, view the Loom video demo:
 
 ---
 
-## 🔗 Links
+## Links
 
-- 🌐 Website: [https://stanquant.com](https://stanquant.com)  
-- 👨‍💻 Developer: [Joshua Elkind](https://www.linkedin.com/in/joshuaelkind)
+- Website: [https://stanquant.com](https://stanquant.com)  
 
 Note: Deployment currently paused, please contact me.
