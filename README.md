@@ -19,7 +19,7 @@ This app lets users:
 
 ## Tech Stack
 
-- ⚛**Frontend:** Next.js + TailwindCSS  
+- **Frontend:** Next.js + TailwindCSS  
 - **Backend:** Django + Django REST Framework  
 - **Data Processing:** Apache Spark (PySpark), Pandas, NumPy  
 - **Database:** AWS RDS (PostgreSQL) with SQLAlchemy ORM  
